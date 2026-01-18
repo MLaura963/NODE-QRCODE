@@ -1,18 +1,9 @@
-// src/services/coupon/create.js
-import fs from "fs";
-import path from "path";
-import QRCode from "qrcode";
-import promptSync from "prompt-sync";
 import chalk from "chalk";
-import { randomBytes } from "crypto";
+import promptSync from "prompt-sync";
+import QRCode from "qrcode";
+import handle from "./handle.js";
 
 const prompt = promptSync({ sigint: true });
-
-function makeCode(prefix = "", length = 8) {
-  const hex = randomBytes(Math.ceil(length / 2)).toString("hex").toUpperCase();
-  const code = hex.slice(0, length);
-  return prefix ? `${prefix}-${code}` : code;
-}
 
 export default async function createCoupons() {
   try {
@@ -31,40 +22,23 @@ export default async function createCoupons() {
     const lengthStr = prompt("Tamanho do código (ex: 8): ");
     const length = Math.max(4, parseInt(lengthStr || "8"));
 
-    const outDir = path.resolve(process.cwd(), "output", "cupons");
-    fs.mkdirSync(outDir, { recursive: true });
-
-    const csvPath = path.join(outDir, "coupons.csv");
-
-    if (!fs.existsSync(csvPath)) {
-      fs.writeFileSync(csvPath, "code,full_url\n", { encoding: "utf8" });
-    }
-
     console.log(chalk.blue(`\nGerando ${count} cupons...\n`));
 
-    const generatedCoupons = [];
+    const result = await handle(baseUrl, prefix, length, count);
 
-    for (let i = 0; i < count; i++) {
-      const code = makeCode(prefix, length);
-      const fullUrl = baseUrl.endsWith("/")
-        ? `${baseUrl}${code}`
-        : `${baseUrl}/${code}`;
-
-      // Salva no Excel/CSV
-      fs.appendFileSync(csvPath, `${code},${fullUrl}\n`, { encoding: "utf8" });
-
-      generatedCoupons.push({ code, url: fullUrl });
+    // Exibir QR Codes no terminal
+    for (let i = 0; i < result.coupons.length; i++) {
+      const { code, url } = result.coupons[i];
 
       console.log(chalk.yellow(`\n📌 CUPOM ${i + 1}/${count}: ${code}`));
 
-      // Gera QR Code direto no terminal (ASCII)
-      const qrAscii = await QRCode.toString(fullUrl, { type: "terminal" });
+      const qrAscii = await QRCode.toString(url, { type: "terminal" });
       console.log(qrAscii);
     }
 
-    console.log(chalk.green.bold("\n=== CUpons GERADOS ===\n"));
+    console.log(chalk.green.bold("\n=== CUPONS GERADOS ===\n"));
 
-    generatedCoupons.forEach((c, index) => {
+    result.coupons.forEach((c, index) => {
       console.log(
         `${index + 1}. ${chalk.cyan(c.code)} → ${chalk.gray(c.url)}`
       );
@@ -72,7 +46,7 @@ export default async function createCoupons() {
 
     console.log(
       chalk.green.bold(
-        `\nArquivo salvo em: ${csvPath}\n`
+        `\nArquivo salvo em: ${result.csvPath}\n`
       )
     );
   } catch (err) {
