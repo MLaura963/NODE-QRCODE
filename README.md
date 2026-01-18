@@ -1,30 +1,26 @@
 # NODE-QRCODE 🚀
 
-Ferramenta em Node.js voltada para uso em cenários de **e-commerce**, capaz de:
+A Node.js tool designed for **e-commerce scenarios**, capable of:
 
-- Gerar **QR Codes**
-- Gerar **senhas aleatórias configuráveis**
-- Gerar **cupons únicos com QR Code exibido no terminal**
-- Exportar cupons para **CSV (Excel)**
+- Generating **QR Codes**
+- Generating **configurable random passwords**
+- Generating **unique coupons with QR Codes displayed in the terminal**
+- Exporting coupons to **CSV (Excel-compatible format)**
 
-O projeto foi estruturado seguindo boas práticas de separação de responsabilidades (`utils → handle → create → index`).
-
----
-
-## 📁 Estrutura do Projeto (simplificada)
+The project is structured following good software design practices with clear separation of responsibilities (`utils → handle → create → index`).
 
 ---
 
-## ⚙️ Pré-requisitos
+## ⚙️ Prerequisites
 
 - Node.js **v18+**
-- NPM instalado
+- NPM installed
 
 ---
 
-## 📦 Instalação
+## 📦 Installation
 
-Clone o repositório:
+Clone the repository:
 
 ```bash
 git clone https://github.com/MLaura963/NODE-QRCODE.git
